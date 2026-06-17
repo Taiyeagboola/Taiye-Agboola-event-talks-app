@@ -472,6 +472,18 @@ body {
     border: 1px solid transparent;
 }
 
+.btn-primary {
+    background: linear-gradient(135deg, var(--gcp-blue), var(--gcp-purple));
+    color: white;
+    box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2b82f6, #b46bfa);
+    box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+    transform: translateY(-1px);
+}
+
 .btn-secondary {
     background: rgba(30, 41, 59, 0.4);
     border-color: var(--border-glass);
@@ -496,6 +508,57 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Card Action Buttons */
+.note-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid var(--border-glass);
+    background: rgba(30, 41, 59, 0.4);
+    color: var(--text-secondary);
+    transition: var(--transition-smooth);
+}
+
+.action-btn:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: var(--text-highlight);
+    color: white;
+}
+
+.action-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+.tweet-btn:hover {
+    border-color: #1d9bf0;
+    color: #1d9bf0;
+    background: rgba(29, 155, 240, 0.1);
+}
+
+.copy-btn {
+    background: rgba(30, 41, 59, 0.4);
+    color: var(--text-secondary);
+}
+
+.copy-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
 }
 
 /* ==========================================

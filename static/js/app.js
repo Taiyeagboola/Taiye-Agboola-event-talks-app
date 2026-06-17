@@ -41,6 +41,7 @@ function initApp() {
         clearSearchBtn: document.getElementById('clear-search-btn'),
         sortSelect: document.getElementById('sort-select'),
         refreshBtn: document.getElementById('refresh-btn'),
+        exportCsvBtn: document.getElementById('export-csv-btn'),
         totalCount: document.getElementById('total-count'),
         lastUpdatedDate: document.getElementById('last-updated-date'),
         activeFiltersBar: document.getElementById('active-filters-bar'),
@@ -56,6 +57,7 @@ function initApp() {
     STATE.dom.clearSearchBtn.addEventListener('click', handleClearSearch);
     STATE.dom.sortSelect.addEventListener('change', handleSortChange);
     STATE.dom.refreshBtn.addEventListener('click', handleRefresh);
+    STATE.dom.exportCsvBtn.addEventListener('click', handleExportCSV);
     STATE.dom.resetFiltersBtn.addEventListener('click', handleResetFilters);
     STATE.dom.prevPageBtn.addEventListener('click', () => changePage(-1));
     STATE.dom.nextPageBtn.addEventListener('click', () => changePage(1));
@@ -237,6 +239,9 @@ function renderNotes() {
                     <span class="note-badge">${note.category}</span>
                 </div>
                 <div class="note-actions">
+                    <button class="action-btn copy-btn" onclick="copyCardText('${note.id}')" title="Copy text to clipboard">
+                        <i data-lucide="copy"></i> Copy
+                    </button>
                     <a href="${twitterIntentUrl}" target="_blank" rel="noopener noreferrer" class="action-btn tweet-btn" title="Tweet about this update">
                         <i data-lucide="twitter"></i> Tweet
                     </a>
@@ -418,4 +423,68 @@ function changePage(direction) {
         // Scroll to notes list top smoothly
         STATE.dom.notesList.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// ==========================================
+// UTILITY FUNCTIONS (CLIPBOARD & EXPORT)
+// ==========================================
+function copyCardText(id) {
+    const note = STATE.allNotes.find(n => n.id === id);
+    if (!note) return;
+    
+    navigator.clipboard.writeText(note.plaintext).then(() => {
+        // Visual feedback
+        const btn = document.querySelector(`[onclick="copyCardText('${id}')"]`);
+        if (btn) {
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check"></i> Copied!`;
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#10b981';
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.style.borderColor = '';
+                btn.style.color = '';
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}
+
+window.copyCardText = copyCardText;
+
+function handleExportCSV() {
+    if (STATE.filteredNotes.length === 0) {
+        alert("No notes available to export.");
+        return;
+    }
+    
+    const headers = ["Date", "Category", "Plaintext Content"];
+    const rows = STATE.filteredNotes.map(note => [
+        note.date,
+        note.category,
+        note.plaintext
+    ]);
+    
+    // Helper to escape CSV cell contents
+    const csvContent = [
+        headers.join(","),
+        ...rows.map(row => row.map(val => `"${val.replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `bigquery_release_notes_${STATE.activeCategory.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
